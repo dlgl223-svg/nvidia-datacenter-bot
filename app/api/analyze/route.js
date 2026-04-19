@@ -1,29 +1,48 @@
 export async function POST(request) {
   const { question, context } = await request.json();
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+      'x-api-key': process.env.ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 300,
       messages: [
         {
-          role: 'system',
-          content: `You are a senior product manager at a major tech company analyzing GPU datacenter competitive positioning. Be concise, sharp, and insight-driven. Use the data provided. Max 3-4 sentences.`,
+          role: 'user',
+          content: `You are a senior product manager analyzing GPU datacenter competitive positioning. Be concise and insight-driven. Max 3-4 sentences.\n\nData:\n${context}\n\nQuestion: ${question}`,
         },
+      ],
+    }),
+  });
+
+export async function POST(request) {
+  const { question, context } = await request.json();
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 300,
+      messages: [
         {
           role: 'user',
-          content: `Here is the competitive data:\n${context}\n\nQuestion: ${question}`,
+          content: `You are a senior product manager analyzing GPU datacenter competitive positioning. Be concise and insight-driven. Max 3-4 sentences.\n\nData:\n${context}\n\nQuestion: ${question}`,
         },
       ],
     }),
   });
 
   const data = await response.json();
-  const answer = data.choices?.[0]?.message?.content || 'No response.';
+  const answer = data.content?.[0]?.text || 'No response.';
   return Response.json({ answer });
 }
