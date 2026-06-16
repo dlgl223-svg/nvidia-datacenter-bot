@@ -8,7 +8,7 @@ module.exports = {
         panel: '#0d0f1a',
         panel2: '#11141f',
         line: '#1d2235',
-        muted: '#8a93ad',
+        muted: 'var(--muted)',
         ghost: '#5a6178',
         brand: '#7df9ff',
         amd: '#ed1c24',

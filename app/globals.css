@@ -5,6 +5,45 @@
 :root {
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* dark theme (default) */
+  --bg: #06070d;
+  --text: #e7ebf5;
+  --soft: rgba(203, 213, 225, 0.9);
+  --muted: #8a93ad;
+  --glass1: rgba(19, 23, 36, 0.85);
+  --glass2: rgba(11, 13, 22, 0.85);
+  --glass-bd: rgba(125, 249, 255, 0.08);
+  --line: rgba(125, 249, 255, 0.10);
+  --surface: rgba(255, 255, 255, 0.05);
+  --surface2: rgba(255, 255, 255, 0.10);
+  --chip-bg: rgba(125, 249, 255, 0.05);
+  --chip-bd: rgba(125, 249, 255, 0.18);
+  --chip-tx: #bfe9ef;
+  --aurora-op: 1;
+  --grid-op: 0.035;
+  --scrollbar: #20263a;
+  --scrollbar-track: #0a0c14;
+}
+
+html.light {
+  --bg: #eaeef6;
+  --text: #0f1526;
+  --soft: rgba(38, 50, 76, 0.95);
+  --muted: #5a6478;
+  --glass1: rgba(255, 255, 255, 0.82);
+  --glass2: rgba(240, 244, 251, 0.9);
+  --glass-bd: rgba(20, 50, 90, 0.12);
+  --line: rgba(20, 50, 90, 0.12);
+  --surface: rgba(15, 30, 60, 0.05);
+  --surface2: rgba(15, 30, 60, 0.10);
+  --chip-bg: rgba(13, 110, 145, 0.08);
+  --chip-bd: rgba(13, 110, 145, 0.30);
+  --chip-tx: #0a6b80;
+  --aurora-op: 0.5;
+  --grid-op: 0.05;
+  --scrollbar: #b9c4d8;
+  --scrollbar-track: #dde4ef;
 }
 
 * { box-sizing: border-box; }
@@ -13,12 +52,22 @@ html { scroll-behavior: smooth; }
 
 body {
   margin: 0;
-  background: #06070d;
-  color: #e7ebf5;
+  background: var(--bg);
+  color: var(--text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  transition: background 0.4s ease, color 0.4s ease;
 }
+
+/* theme-aware helpers */
+.t-text { color: var(--text); }
+.t-soft { color: var(--soft); }
+.t-muted { color: var(--muted); }
+.surface { background: var(--surface); }
+.surface2 { background: var(--surface2); }
+.surface-hover:hover { background: var(--surface2); }
+.bd-line { border-color: var(--line) !important; }
 
 /* Ambient animated backdrop */
 .aurora {
@@ -31,6 +80,8 @@ body {
     radial-gradient(55% 45% at 85% 10%, rgba(118, 185, 0, 0.10), transparent 60%),
     radial-gradient(50% 60% at 50% 110%, rgba(237, 28, 36, 0.08), transparent 60%);
   filter: saturate(1.1);
+  opacity: var(--aurora-op);
+  transition: opacity 0.4s ease;
 }
 
 .grid-overlay {
@@ -39,25 +90,32 @@ body {
   z-index: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(125, 249, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(125, 249, 255, 0.035) 1px, transparent 1px);
+    linear-gradient(rgba(125, 169, 255, var(--grid-op)) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(125, 169, 255, var(--grid-op)) 1px, transparent 1px);
   background-size: 46px 46px;
   mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 35%, transparent 75%);
 }
 
 ::-webkit-scrollbar { width: 11px; height: 11px; }
-::-webkit-scrollbar-track { background: #0a0c14; }
-::-webkit-scrollbar-thumb { background: #20263a; border-radius: 8px; border: 2px solid #0a0c14; }
-::-webkit-scrollbar-thumb:hover { background: #2b3450; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 8px; border: 2px solid var(--scrollbar-track); }
+::-webkit-scrollbar-thumb:hover { filter: brightness(1.25); }
 
 .glass {
-  background: linear-gradient(180deg, rgba(19, 23, 36, 0.85), rgba(11, 13, 22, 0.85));
+  background: linear-gradient(180deg, var(--glass1), var(--glass2));
   backdrop-filter: blur(14px);
-  border: 1px solid rgba(125, 249, 255, 0.08);
+  border: 1px solid var(--glass-bd);
+  transition: background 0.4s ease, border-color 0.4s ease;
 }
 
 .text-gradient {
   background: linear-gradient(120deg, #ffffff 0%, #9fe9ff 45%, #7df9ff 70%, #b6ff6b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+html.light .text-gradient {
+  background: linear-gradient(120deg, #0f1526 0%, #0e7d92 45%, #0aa2c0 70%, #3f9e1f 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -72,9 +130,9 @@ body {
   text-transform: uppercase;
   padding: 0.28rem 0.6rem;
   border-radius: 999px;
-  border: 1px solid rgba(125, 249, 255, 0.18);
-  background: rgba(125, 249, 255, 0.05);
-  color: #bfe9ef;
+  border: 1px solid var(--chip-bd);
+  background: var(--chip-bg);
+  color: var(--chip-tx);
 }
 
 .card-hover {

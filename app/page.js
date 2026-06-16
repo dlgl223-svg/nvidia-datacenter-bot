@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { PARTS, TOTALS, META, PRICE_AS_OF } from '../lib/build';
 import PartCard from './components/PartCard';
+import ThemeToggle from './components/ThemeToggle';
 
 // three.js scene is client-only
 const Build3D = dynamic(() => import('./components/Build3D'), {
@@ -51,13 +52,18 @@ export default function Page() {
 
   return (
     <main className="max-w-6xl mx-auto px-4 sm:px-6 pb-24">
+      {/* theme toggle */}
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
+
       {/* ───── HERO ───── */}
       <header className="pt-16 sm:pt-24 pb-10 text-center">
         <div className="chip mx-auto mb-5 animate-floaty">⚡ Flagship build showcase · Updated {PRICE_AS_OF}</div>
         <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight">
           <span className="text-gradient">{META.name}</span>
         </h1>
-        <p className="mt-4 text-slate-300/90 max-w-2xl mx-auto text-base sm:text-lg">
+        <p className="mt-4 t-soft max-w-2xl mx-auto text-base sm:text-lg">
           {META.subtitle}
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm">
@@ -79,7 +85,7 @@ export default function Page() {
               <p className="text-xs font-mono text-brand/80">
                 {explode < 0.05 ? 'COMPLETED BUILD' : explode > 0.9 ? 'EXPLODED VIEW' : 'DISASSEMBLING…'}
               </p>
-              <p className="text-[10px] text-muted mt-0.5">drag to orbit · scroll to zoom · click a part</p>
+              <p className="text-[10px] text-slate-400 mt-0.5">drag to orbit · scroll to zoom · click a part</p>
             </div>
             {focused && (
               <span className="chip">{PARTS.find((p) => p.id === focused)?.name || focused}</span>
@@ -87,15 +93,15 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="px-5 sm:px-8 py-5 border-t border-line/60 flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="px-5 sm:px-8 py-5 border-t bd-line flex flex-col sm:flex-row sm:items-center gap-4">
           <div className="flex gap-2">
             <button
               onClick={() => setExplode(0)}
-              className={`text-xs px-3 py-2 rounded-lg ring-1 transition ${explode < 0.05 ? 'bg-brand/15 text-brand ring-brand/40' : 'bg-white/5 text-slate-300 ring-white/10 hover:bg-white/10'}`}
+              className={`text-xs px-3 py-2 rounded-lg ring-1 transition ${explode < 0.05 ? 'bg-brand/15 text-brand ring-brand/40' : 'surface t-soft ring-transparent surface-hover'}`}
             >Assembled</button>
             <button
               onClick={() => setExplode(1)}
-              className={`text-xs px-3 py-2 rounded-lg ring-1 transition ${explode > 0.95 ? 'bg-brand/15 text-brand ring-brand/40' : 'bg-white/5 text-slate-300 ring-white/10 hover:bg-white/10'}`}
+              className={`text-xs px-3 py-2 rounded-lg ring-1 transition ${explode > 0.95 ? 'bg-brand/15 text-brand ring-brand/40' : 'surface t-soft ring-transparent surface-hover'}`}
             >Exploded</button>
           </div>
           <div className="flex-1 flex items-center gap-3">
@@ -114,7 +120,7 @@ export default function Page() {
       <section className="glass rounded-2xl p-5 sm:p-6 mb-12 sticky top-3 z-20">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 className="text-sm font-semibold text-slate-200">Build tracker</h2>
+            <h2 className="text-sm font-semibold t-text">Build tracker</h2>
             <p className="text-xs text-muted mt-0.5">
               {ownedCount} / {PARTS.length} parts owned · {usd(ownedCost)} spent · {usd(TOTALS.current - ownedCost)} to go
             </p>
@@ -123,7 +129,7 @@ export default function Page() {
             <div className="text-2xl font-bold text-gradient">{pct}%</div>
           </div>
         </div>
-        <div className="mt-3 h-2.5 rounded-full bg-white/5 overflow-hidden">
+        <div className="mt-3 h-2.5 rounded-full surface overflow-hidden">
           <div className="bar-fill h-full rounded-full" style={{ width: `${pct}%` }} />
         </div>
         {ownedCount > 0 && (
@@ -150,7 +156,7 @@ export default function Page() {
       {/* ───── FOOTER ───── */}
       <footer className="mt-16 text-center text-xs text-muted space-y-2">
         <p>
-          Estimated total: <span className="text-slate-200 font-semibold">{usd(TOTALS.current)}</span>{' '}
+          Estimated total: <span className="t-text font-semibold">{usd(TOTALS.current)}</span>{' '}
           (range {usd(TOTALS.low)}–{usd(TOTALS.high)}) · prices as of {PRICE_AS_OF}.
         </p>
         <p className="max-w-xl mx-auto">

@@ -16,9 +16,14 @@ export const viewport = {
   initialScale: 1,
 };
 
+const themeScript = `(function(){try{var t=localStorage.getItem('apex-theme');if(!t){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}document.documentElement.classList.add(t);}catch(e){document.documentElement.classList.add('dark');}})();`;
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${inter.variable} ${mono.variable}`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body>
         <div className="aurora" />
         <div className="grid-overlay" />
