@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Project APEX — RTX 4090 × Ryzen 9 9950X3D Build Showcase</title>
+<meta name="description" content="Interactive showcase of a high-end PC build: pricing, animated part explainers, an exploded 3D view, full specs, and a build tracker." />
+<meta name="theme-color" content="#06070d" />
+<!-- no-flash theme init -->
+<script>
+(function(){try{var t=localStorage.getItem('apex-theme');if(!t){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}document.documentElement.classList.add(t);}catch(e){document.documentElement.classList.add('dark');}})();
+</script>
+<!-- three.js (only runtime dependency; needs internet for the 3D view) -->
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+}}
+</script>
+<style>
+:root{
+  --font-sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  --bg:#06070d;--text:#e7ebf5;--soft:rgba(203,213,225,.9);--muted:#8a93ad;
+  --glass1:rgba(19,23,36,.85);--glass2:rgba(11,13,22,.85);--glass-bd:rgba(125,249,255,.08);
+  --line:rgba(125,249,255,.10);--surface:rgba(255,255,255,.05);--surface2:rgba(255,255,255,.10);
+  --chip-bg:rgba(125,249,255,.05);--chip-bd:rgba(125,249,255,.18);--chip-tx:#bfe9ef;
+  --aurora-op:1;--grid-op:.035;--scrollbar:#20263a;--scrollbar-track:#0a0c14;
+  --brand:#7df9ff;--emerald:#34d399;--amber:#f4c042;
+}
+html.light{
+  --bg:#eaeef6;--text:#0f1526;--soft:rgba(38,50,76,.95);--muted:#5a6478;
+  --glass1:rgba(255,255,255,.82);--glass2:rgba(240,244,251,.9);--glass-bd:rgba(20,50,90,.12);
+  --line:rgba(20,50,90,.12);--surface:rgba(15,30,60,.05);--surface2:rgba(15,30,60,.10);
+  --chip-bg:rgba(13,110,145,.08);--chip-bd:rgba(13,110,145,.30);--chip-tx:#0a6b80;
+  --aurora-op:.5;--grid-op:.05;--scrollbar:#b9c4d8;--scrollbar-track:#dde4ef;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-sans);-webkit-font-smoothing:antialiased;overflow-x:hidden;transition:background .4s,color .4s}
+a{color:inherit}
+.aurora{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:var(--aurora-op);transition:opacity .4s;
+  background:radial-gradient(60% 50% at 15% 0%,rgba(125,249,255,.10),transparent 60%),radial-gradient(55% 45% at 85% 10%,rgba(118,185,0,.10),transparent 60%),radial-gradient(50% 60% at 50% 110%,rgba(237,28,36,.08),transparent 60%)}
+.grid-overlay{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(125,169,255,var(--grid-op)) 1px,transparent 1px),linear-gradient(90deg,rgba(125,169,255,var(--grid-op)) 1px,transparent 1px);
+  background-size:46px 46px;-webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,#000 35%,transparent 75%);mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,#000 35%,transparent 75%)}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:var(--scrollbar-track)}
+::-webkit-scrollbar-thumb{background:var(--scrollbar);border-radius:8px;border:2px solid var(--scrollbar-track)}
+.wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 20px 96px}
+.glass{background:linear-gradient(180deg,var(--glass1),var(--glass2));backdrop-filter:blur(14px);border:1px solid var(--glass-bd);transition:background .4s,border-color .4s}
+.chip{display:inline-flex;align-items:center;gap:.4rem;font-size:.7rem;letter-spacing:.04em;text-transform:uppercase;padding:.28rem .6rem;border-radius:999px;border:1px solid var(--chip-bd);background:var(--chip-bg);color:var(--chip-tx)}
+.muted{color:var(--muted)}.soft{color:var(--soft)}
+.mono{font-family:var(--font-mono)}
+.gradient{background:linear-gradient(120deg,#fff 0%,#9fe9ff 45%,#7df9ff 70%,#b6ff6b 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+html.light .gradient{background:linear-gradient(120deg,#0f1526 0%,#0e7d92 45%,#0aa2c0 70%,#3f9e1f 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+/* theme toggle */
+.theme-toggle{position:fixed;top:16px;right:16px;z-index:50;width:40px;height:40px;border-radius:999px;display:grid;place-items:center;font-size:16px;cursor:pointer;color:var(--text)}
+.theme-toggle:hover{transform:scale(1.06)}.theme-toggle:active{transform:scale(.95)}
+/* hero */
+.hero{text-align:center;padding:96px 0 40px}
+@media(max-width:640px){.hero{padding:64px 0 32px}}
+.hero h1{font-size:clamp(2.4rem,7vw,3.8rem);font-weight:800;letter-spacing:-.02em;margin:0}
+.hero .subtitle{margin:16px auto 0;max-width:640px;font-size:clamp(1rem,2.4vw,1.15rem)}
+.stats{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:32px}
+.stat{border-radius:12px;padding:10px 16px;text-align:left}
+.stat .l{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.stat .v{font-size:1.1rem;font-weight:700}
+.floaty{animation:floaty 5s ease-in-out infinite}
+/* viewer */
+.viewer{border-radius:24px;overflow:hidden;margin-bottom:56px}
+.canvas-wrap{position:relative;height:520px}
+@media(max-width:640px){.canvas-wrap{height:420px}}
+#scene{width:100%;height:100%;display:block;background:#070811;touch-action:none}
+.overlay{position:absolute;top:16px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none}
+.overlay .state{font-family:var(--font-mono);font-size:12px;color:rgba(125,249,255,.85)}
+.overlay .hint{font-size:10px;color:#9aa6bd;margin-top:2px}
+.controls{display:flex;flex-direction:row;align-items:center;gap:16px;padding:20px;border-top:1px solid var(--line)}
+@media(max-width:640px){.controls{flex-direction:column;align-items:stretch}}
+.btn{font-size:12px;padding:8px 12px;border-radius:8px;border:1px solid transparent;background:var(--surface);color:var(--soft);cursor:pointer;transition:.2s}
+.btn:hover{background:var(--surface2)}
+.btn.active{background:rgba(125,249,255,.15);color:var(--brand);border-color:rgba(125,249,255,.4)}
+.range-row{flex:1;display:flex;align-items:center;gap:12px}
+input[type=range]{width:100%;accent-color:#7df9ff}
+/* tracker */
+.tracker{border-radius:16px;padding:22px;margin-bottom:48px;position:sticky;top:12px;z-index:20}
+.tracker .top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px}
+.tracker h2{margin:0;font-size:14px;font-weight:600}
+.pct{font-size:1.6rem;font-weight:700}
+.track{margin-top:12px;height:10px;border-radius:999px;background:var(--surface);overflow:hidden}
+.bar{height:100%;border-radius:999px;background:linear-gradient(90deg,#7df9ff,#b6ff6b);box-shadow:0 0 18px -2px rgba(125,249,255,.6);transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.linkbtn{margin-top:12px;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer}
+.linkbtn:hover{color:#fca5a5}
+/* grid + cards */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.grid{grid-template-columns:1fr}}
+.card{border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s,border-color .35s}
+.card:hover{transform:translateY(-4px);border-color:rgba(125,249,255,.35);box-shadow:0 24px 60px -28px rgba(0,0,0,.95)}
+.card.owned{box-shadow:0 0 0 1px rgba(52,211,153,.5)}
+.edge{height:4px;width:100%}
+.card-body{padding:20px;display:flex;flex-direction:column;gap:16px;flex:1}
+.card-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.card-head h3{margin:8px 0 2px;font-size:1.05rem;font-weight:600;line-height:1.2}
+.price{font-size:1.25rem;font-weight:700}
+.price-range{font-size:11px;font-family:var(--font-mono);color:var(--muted)}
+.msrp{font-size:10px;color:#f59e0b;margin-top:2px}
+.art{position:relative;border-radius:12px;border:1px solid var(--line);height:144px;overflow:hidden;background:#080a12}
+.art svg{width:100%;height:100%;padding:8px}
+.tagline{font-size:.9rem;color:var(--soft);line-height:1.5}
+.tabs{display:flex;gap:4px;font-size:12px}
+.tab{padding:6px 12px;border-radius:8px;border:none;background:none;color:var(--muted);cursor:pointer;transition:.2s}
+.tab.active{background:var(--surface2);color:var(--text)}
+.specs{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:12px;margin:0}
+.specs .row{display:flex;flex-direction:column;border-bottom:1px solid var(--line);padding-bottom:6px}
+.specs dt{color:var(--muted)}.specs dd{margin:0;font-weight:500}
+.func{font-size:12px;display:flex;flex-direction:column;gap:12px}
+.func p{margin:0;color:var(--soft);line-height:1.5}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.steps li{display:flex;gap:8px}
+.steps .n{flex:none;width:20px;height:20px;border-radius:999px;display:grid;place-items:center;font-size:10px;font-weight:700}
+.steps span:last-child{color:var(--soft)}
+.alts{display:flex;flex-direction:column;gap:6px}
+.alts .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid var(--line);color:var(--soft);cursor:help}
+.pill.cur{border-color:rgba(52,211,153,.4);color:#34d399;background:rgba(52,211,153,.08)}
+.pill .yr{font-size:8px;font-weight:700;color:#34d399}
+.pill .pr{color:var(--muted)}
+.card-foot{margin-top:auto;padding-top:8px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.src{font-size:10px;color:var(--muted);text-decoration:underline dotted;text-underline-offset:2px}
+.src:hover{color:var(--brand)}
+.buy{font-size:12px;font-weight:500;padding:8px 12px;border-radius:8px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--text);transition:.2s}
+.buy:hover{background:var(--surface2)}
+.buy.owned{background:rgba(52,211,153,.15);color:#34d399;border-color:rgba(52,211,153,.4)}
+footer{margin-top:64px;text-align:center;font-size:12px;color:var(--muted);line-height:1.7}
+footer .t{color:var(--text);font-weight:600}
+/* animations */
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes pulseGlow{0%,100%{opacity:.45}50%{opacity:1}}
+@keyframes flow{to{stroke-dashoffset:-200}}
+@keyframes riseIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.pulseGlow{animation:pulseGlow 2.6s ease-in-out infinite}
+.flow{stroke-dasharray:6 10;animation:flow 1.2s linear infinite}
+.rise{animation:riseIn .6s ease both}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;animation-iteration-count:1!important}}
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+<div class="grid-overlay"></div>
+<button class="theme-toggle glass" id="themeToggle" aria-label="Toggle light or dark theme">☀️</button>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="chip floaty" style="margin:0 auto 20px">⚡ Flagship build showcase · Updated <span id="asof"></span></div>
+    <h1><span class="gradient" id="title"></span></h1>
+    <p class="subtitle soft" id="subtitle"></p>
+    <div class="stats" id="stats"></div>
+    <p class="muted" style="margin-top:12px;font-size:11px">Prices are US street estimates researched <span class="asof"></span>; click “price source” on any card to verify.</p>
+  </header>
+
+  <section class="viewer glass">
+    <div class="canvas-wrap">
+      <canvas id="scene"></canvas>
+      <div class="overlay">
+        <div>
+          <div class="state" id="viewState">COMPLETED BUILD</div>
+          <div class="hint">drag to orbit · scroll to zoom · click a part</div>
+        </div>
+        <span class="chip" id="focusChip" style="display:none"></span>
+      </div>
+    </div>
+    <div class="controls">
+      <div style="display:flex;gap:8px">
+        <button class="btn active" id="btnAssembled">Assembled</button>
+        <button class="btn" id="btnExploded">Exploded</button>
+      </div>
+      <div class="range-row">
+        <span class="muted mono" style="font-size:11px;flex:none">EXPLODE</span>
+        <input type="range" min="0" max="1" step="0.01" value="0" id="explode" aria-label="Explode amount" />
+      </div>
+    </div>
+  </section>
+
+  <section class="tracker glass">
+    <div class="top">
+      <div>
+        <h2>Build tracker</h2>
+        <p class="muted" id="trackerText" style="font-size:12px;margin:4px 0 0"></p>
+      </div>
+      <div class="pct gradient" id="pct">0%</div>
+    </div>
+    <div class="track"><div class="bar" id="bar" style="width:0%"></div></div>
+    <button class="linkbtn" id="resetBtn" style="display:none">reset tracker</button>
+  </section>
+
+  <section class="grid" id="grid"></section>
+
+  <footer>
+    <p>Estimated total: <span class="t" id="footTotal"></span> (range <span id="footRange"></span>) · prices as of <span class="asof"></span>.</p>
+    <p style="max-width:620px;margin:8px auto 0">Illustrations are original schematic art, not product photos. GPU &amp; SSD prices are elevated above MSRP due to 2025–26 AI-demand and NAND shortages. Your “owned” selections are saved in this browser only.</p>
+  </footer>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+/* ───────────────────────── DATA ───────────────────────── */
+const PRICE_AS_OF = 'June 15, 2026';
+const META = { name:'Project APEX', subtitle:'A no-compromise Ryzen 9 9950X3D × RTX 4090 flagship in a Lian Li O11D EVO' };
+
+const PARTS = [
+  { id:'cpu', category:'Processor', name:'AMD Ryzen 9 9950X3D', brand:'AMD', accent:'#ed1c24', art:'cpu',
+    tagline:'16 Zen 5 cores with second-gen 3D V-Cache — the fastest do-everything desktop chip.',
+    price:{current:679,low:679,high:729,msrp:699}, quantity:1,
+    specs:[['Cores / Threads','16C / 32T'],['Architecture','Zen 5 (4 nm)'],['Base / Boost','4.3 / 5.7 GHz'],['Cache','144 MB (L2+L3, 3D V-Cache)'],['TDP','170 W (200 W PPT)'],['Socket','AM5']],
+    how:{summary:'A stacked block of extra L3 cache (3D V-Cache) sits on the CCD so games keep their working set on-die — huge frame-rate wins — while 16 full Zen 5 cores chew through rendering and compiles.',
+      steps:['Instructions stream into the cores from system memory.','A 3D-stacked V-Cache layer feeds data back in ~nanoseconds, avoiding slow RAM trips.','16 cores execute in parallel; smart scheduling keeps games on the cache-rich die.']},
+    alts:[{name:'Ryzen 9 9950X3D2 Dual Edition',note:'Newer 2026 dual-3D-cache variant; ~$899.',price:899,current:true}],
+    sources:[{label:'Amazon price ($679, Jun 2026)',url:'https://camelcamelcamel.com/product/B0DVZSG8D5'},{label:'AMD launch MSRP $699',url:'https://www.techradar.com/computing/cpu/amd-officially-announces-price-and-release-date-for-ryzen-9-9900x3d-and-9950x3d-processors'}] },
+
+  { id:'gpu', category:'Graphics Card', name:'NVIDIA GeForce RTX 4090', brand:'NVIDIA', accent:'#76b900', art:'gpu',
+    tagline:'24 GB of Ada Lovelace muscle — 4K maxed, ray-traced, DLSS-accelerated.',
+    price:{current:2550,low:2450,high:2900,msrp:1599,elevated:true}, quantity:1,
+    specs:[['CUDA Cores','16,384'],['Memory','24 GB GDDR6X'],['Memory Bus','384-bit (1008 GB/s)'],['Boost Clock','~2.52 GHz'],['Ray Tracing','3rd-gen RT + 4th-gen Tensor'],['Board Power','450 W (12VHPWR)']],
+    how:{summary:'Thousands of CUDA cores rasterize geometry in parallel; dedicated RT cores trace light bounces while Tensor cores run DLSS to reconstruct extra frames — all kept cool by a triple-slot vapor chamber.',
+      steps:['Scene geometry is shaded across 16,384 CUDA cores at once.','RT cores compute realistic reflections, shadows and global illumination.','Tensor cores apply DLSS upscaling / frame-gen for higher FPS.','A vapor chamber + triple fans dump 450 W of heat out of the card.']},
+    alts:[{name:'RTX 5090 (Blackwell)',note:'Current gen; 32GB GDDR7, ~30% faster — but ~$4,250 street.',price:4249,current:true},{name:'RTX 5080 (Blackwell)',note:'Current gen; ~4090-class raster, 16GB, ~$1,250.',price:1249,current:true},{name:'RTX 4080 Super',note:'Lower cost, ~85% of the performance at 4K.'}],
+    sources:[{label:'June 2026 street price ($2,450–2,755)',url:'https://bestvaluegpu.com/history/new-and-used-rtx-4090-price-history-and-specs/'},{label:'RTX 5090/5080 June 2026 pricing',url:'https://bestvaluegpu.com/history/new-and-used-rtx-5090-price-history-and-specs/'}] },
+
+  { id:'mobo', category:'Motherboard', name:'ASUS ROG Strix X670E-E Gaming WiFi', brand:'ASUS', accent:'#ff2d75', art:'mobo',
+    tagline:'An 18+2-stage AM5 foundation with PCIe 5.0, four M.2 slots and WiFi 6E.',
+    price:{current:489,low:350,high:700,msrp:499}, quantity:1,
+    specs:[['Chipset','AMD X670E'],['Socket','AM5 (LGA 1718)'],['VRM','18 + 2 power stages'],['Memory','4× DDR5, up to 8000+ (OC)'],['Expansion','PCIe 5.0 x16 + 4× M.2'],['Networking','2.5 GbE + WiFi 6E']],
+    how:{summary:'The board is the nervous system: the VRM converts 12 V into clean, low-ripple voltage for the CPU, while the chipset fans out high-speed PCIe and USB lanes to every component.',
+      steps:['VRM phases step 12 V down to ~1.2 V and smooth it for the CPU.','The X670E chipset routes PCIe 5.0 lanes to GPU and NVMe storage.','Traces carry DDR5, USB, and networking signals across the PCB.']},
+    alts:[{name:'ASUS ROG Strix X870E-E Gaming WiFi',note:'Current gen; WiFi 7, USB4, native PCIe 5.0 M.2; ~$470.',price:470,current:true},{name:'MSI MPG X670E Carbon WiFi',note:'Similar tier, stealthy black aesthetic.'}],
+    sources:[{label:'Price history (low $350 – high $700)',url:'https://pangoly.com/en/price-history/asus-rog-strix-x670e-e-gaming-wifi'},{label:'X870E-E pricing (current gen)',url:'https://pangoly.com/en/price-history/asus-rog-strix-x870e-e-gaming-wifi'}] },
+
+  { id:'ram', category:'Memory', name:'32 GB DDR5-6000 CL30 (2×16 GB) EXPO', brand:'G.SKILL / Corsair', accent:'#9b7dff', art:'ram',
+    tagline:'The Ryzen sweet spot — 6000 MT/s at CL30 with one-click EXPO timings.',
+    price:{current:174,low:160,high:210,msrp:180}, quantity:1,
+    specs:[['Capacity','32 GB (2 × 16 GB)'],['Speed','DDR5-6000 MT/s'],['Latency','CL30 (30-38-38)'],['Profile','AMD EXPO + Intel XMP'],['Voltage','1.35 V'],['Form Factor','UDIMM']],
+    how:{summary:'6000 MT/s keeps the memory clock in 1:1 sync with the Ryzen Infinity Fabric for the lowest latency, and the EXPO profile applies tuned timings instantly in BIOS.',
+      steps:['EXPO profile loads validated 6000 / CL30 timings on boot.','Data shuttles between RAM and CPU in tight 1:1 fabric sync.','Dual-channel doubles the path width for more bandwidth.']},
+    alts:[{name:'DDR5-6400 CL32 CUDIMM',note:'Current-gen clocked memory; needs X870E + 9000-series for full speed.',current:true},{name:'64 GB (2×32 GB) DDR5-6000',note:'Double the capacity for heavy multitasking / VMs.'}],
+    sources:[{label:'DDR5-6000 CL30 kits ~$160–210',url:'https://pangoly.com/en/price-history/kingston-fury-beast-32gb-ddr5-6000-amd-expo'}] },
+
+  { id:'ssd', category:'Storage', name:'Samsung 990 Pro 2 TB NVMe Gen4', brand:'Samsung', accent:'#3b82f6', art:'ssd',
+    tagline:'7,450 MB/s of PCIe 4.0 NVMe — near-instant loads for OS, games and projects.',
+    price:{current:389,low:369,high:430,msrp:250,elevated:true}, quantity:1,
+    specs:[['Capacity','2 TB'],['Interface','PCIe 4.0 ×4 NVMe'],['Seq. Read','up to 7,450 MB/s'],['Seq. Write','up to 6,900 MB/s'],['Form Factor','M.2 2280'],['Endurance','1,200 TBW']],
+    how:{summary:'NAND flash stores data with no moving parts; the controller talks to the CPU directly over four PCIe 4.0 lanes, so reads happen in microseconds instead of milliseconds.',
+      steps:['The controller maps file requests to NAND flash cells.','Four PCIe 4.0 lanes carry data straight to the CPU.','A DRAM cache and SLC buffer keep bursts blisteringly fast.']},
+    alts:[{name:'Samsung 9100 Pro 2 TB (Gen5)',note:'Current gen; up to 14,700 MB/s on PCIe 5.0; ~$350.',price:350,current:true},{name:'WD Black SN8100 2 TB (Gen5)',note:'Current-gen PCIe 5.0 rival, excellent efficiency.',current:true},{name:'WD Black SN850X 2 TB',note:'Comparable Gen4 speed, often a few dollars cheaper.'}],
+    sources:[{label:'Samsung 990 Pro 2TB ~$389 (Jun 2026)',url:'https://pangoly.com/en/price-history/samsung-990-pro-2tb'},{label:'Samsung 9100 Pro Gen5 pricing',url:'https://pangoly.com/en/compare/ssd/samsung-9100-pro-2tb-vs-western-digital-wd-black-sn8100-2tb'}] },
+
+  { id:'psu', category:'Power Supply', name:'Corsair RM1000x Shift (1000 W Gold)', brand:'Corsair', accent:'#f4c042', art:'psu',
+    tagline:'Fully modular ATX 3.1 with native 12V-2x6 — headroom for the 4090 and then some.',
+    price:{current:189,low:160,high:220,msrp:199}, quantity:1,
+    specs:[['Wattage','1000 W'],['Efficiency','80+ Gold'],['Standard','ATX 3.1 / PCIe 5.1'],['GPU Cable','Native 12V-2x6 (600 W)'],['Modularity','Fully modular (side interface)'],['Fan','Zero-RPM mode']],
+    how:{summary:'It rectifies wall AC into smooth DC rails, delivering 12 V to the GPU and CPU on demand. The side-mounted connectors make cabling in a dual-chamber case clean and short.',
+      steps:['AC from the wall is rectified and filtered.','Transformers + regulation produce stable 12 V / 5 V / 3.3 V rails.','Modular cables deliver only the power each part needs.']},
+    alts:[{name:'Seasonic Prime TX-1000',note:'80+ Titanium, premium efficiency.'}],
+    sources:[{label:'RM1000x Shift listing & deals',url:'https://www.corsair.com/us/en/p/psu/cp-9020253-na/rm1000x-shift-80-plus-gold-fully-modular-atx-power-supply-cp-9020253-na'}] },
+
+  { id:'cooler', category:'CPU Cooler', name:'Arctic Liquid Freezer III 360', brand:'Arctic', accent:'#22d3ee', art:'cooler',
+    tagline:'A 360 mm AIO that out-cools coolers twice its price — tames the 9950X3D with ease.',
+    price:{current:119,low:100,high:130,msrp:128}, quantity:1,
+    specs:[['Radiator','360 mm (3 × 120)'],['Pump','Integrated, PWM-controlled'],['Fans','3 × P12 Pro PWM'],['VRM Fan','Built-in 40 mm'],['Cold Plate','Nickel-plated copper'],['Sockets','AM5 / LGA1700+']],
+    how:{summary:'A pump pushes coolant across the hot CPU cold plate; the warmed liquid flows to the radiator where three fans blow the heat into airflow and out of the case.',
+      steps:['Cold plate absorbs heat from the CPU lid.','Pump circulates coolant up to the radiator.','Radiator fins shed heat; fans exhaust it from the case.']},
+    alts:[{name:'NZXT Kraken Plus 360',note:'LCD display, RGB-forward styling.'}],
+    sources:[{label:'Liquid Freezer III 360 ~$100–130',url:'https://pangoly.com/en/price-history/arctic-liquid-freezer-iii-360'}] },
+
+  { id:'fans', category:'Case Fans', name:'Arctic P12 Pro PWM ×10', brand:'Arctic', accent:'#34d399', art:'fans',
+    tagline:'Ten high-static-pressure 120 mm fans — bottom & side intake, top & rear exhaust.',
+    price:{current:90,low:72,high:180,msrp:90}, quantity:10,
+    specs:[['Count','10 × 120 mm'],['Type','High static pressure PWM'],['Speed','200–3000 RPM'],['Bearing','Fluid dynamic'],['Layout','3 bottom / 3 side rad / 3 top / 1 rear'],['Airflow','Intake-positive pressure']],
+    how:{summary:'Intake fans on the bottom and side feed cool air straight onto the GPU and radiator; top and rear exhaust pull the hot air out, creating a clean front-to-back, bottom-to-top flow.',
+      steps:['Bottom + side fans pull cool outside air in (positive pressure).','Air is forced across the GPU and through the radiator.','Top + rear fans exhaust the heated air out of the case.']},
+    alts:[{name:'Lian Li UNI FAN SL120',note:'Daisy-chain RGB that matches the O11D EVO.'},{name:'Noctua NF-F12 PWM',note:'Quietest option for exhaust positions.'}],
+    sources:[{label:'P12 Pro PST 5-pack $35.99 (≈$7.20/fan)',url:'https://ssdbuddy.com/arctic-p12-pro-pst-review-2026/'}] },
+
+  { id:'case', category:'Case', name:'Lian Li O11D EVO RGB', brand:'Lian Li', accent:'#cbd5e1', art:'case',
+    tagline:'A dual-chamber showcase chassis built for big radiators and clean cable runs.',
+    price:{current:159,low:150,high:170,msrp:169}, quantity:1,
+    specs:[['Form Factor','Mid-tower (E-ATX)'],['Layout','Dual chamber'],['Radiator','Up to 420 mm'],['Glass','Front + side tempered'],['Fan Mounts','10 × 120 mm'],['Design','Reversible chassis + ARGB strips']],
+    how:{summary:'A dual-chamber design hides the PSU and cables behind the motherboard tray, leaving the main chamber an open, glass-wrapped stage for the GPU, board and cooling.',
+      steps:['Front chamber stages the motherboard, GPU and radiators.','Rear chamber conceals the PSU, drives and all cabling.','Tempered glass on two sides puts the build on display.']},
+    alts:[{name:'Lian Li O11D EVO RGB V2',note:'Current-gen 2026 refresh; improved airflow & modularity; ~$170.',price:170,current:true}],
+    sources:[{label:'O11D EVO RGB ~$159–170',url:'https://pangoly.com/en/price-history/lian-li-o11d-evo-rgb'}] },
+];
+
+const usd = n => '$' + Math.round(n).toLocaleString('en-US');
+const TOTALS = PARTS.reduce((a,p)=>({low:a.low+p.price.low,high:a.high+p.price.high,current:a.current+p.price.current}),{low:0,high:0,current:0});
+
+/* ───────────────── SVG PART ART (animated) ───────────────── */
+function spinner(cx,cy,r,color,dur,blades=7){
+  let p='';
+  for(let i=0;i<blades;i++){const a=(i/blades)*Math.PI*2;const x2=cx+Math.cos(a)*r,y2=cy+Math.sin(a)*r;
+    p+=`<path d="M${cx},${cy} Q${cx+Math.cos(a+0.5)*r*0.6},${cy+Math.sin(a+0.5)*r*0.6} ${x2},${y2}" stroke="${color}" stroke-width="2.4" stroke-linecap="round" fill="none" opacity="0.85"/>`;}
+  return `<g><circle cx="${cx}" cy="${cy}" r="${r+2}" fill="#0a0c14" stroke="${color}" stroke-opacity="0.4"/>
+    <g>${p}<circle cx="${cx}" cy="${cy}" r="${r*0.28}" fill="${color}"/>
+    <animateTransform attributeName="transform" type="rotate" from="0 ${cx} ${cy}" to="360 ${cx} ${cy}" dur="${dur}" repeatCount="indefinite"/></g></g>`;
+}
+const ART = {
+  cpu:c=>{let pins='';for(let i=0;i<11;i++)pins+=`<rect x="${42+i*11}" y="24" width="3" height="8" fill="${c}" opacity="0.5"/><rect x="${42+i*11}" y="108" width="3" height="8" fill="${c}" opacity="0.5"/>`;
+    let dots='';for(let i=0;i<3;i++)dots+=`<circle r="2.4" fill="${c}"><animateMotion dur="1.6s" begin="${i*0.5}s" repeatCount="indefinite" path="M76,96 L76,44"/></circle>`;
+    return `<svg viewBox="0 0 200 140">${pins}<rect x="44" y="32" width="112" height="76" rx="8" fill="#11141f" stroke="${c}" stroke-opacity="0.55"/>
+    <rect x="56" y="44" width="40" height="52" rx="4" fill="#11141f" stroke="${c}" stroke-opacity="0.4"/><rect x="104" y="44" width="40" height="52" rx="4" fill="#11141f" stroke="${c}" stroke-opacity="0.4"/>
+    <rect x="56" y="44" width="40" height="52" rx="4" fill="${c}" class="pulseGlow" opacity="0.18"/>
+    <text x="100" y="74" text-anchor="middle" font-size="9" fill="${c}" font-family="monospace" opacity="0.9">3D V-CACHE</text>${dots}</svg>`;},
+  gpu:c=>{let waves='';for(let i=0;i<3;i++)waves+=`<path d="M${50+i*50},44 q6,-10 0,-18" stroke="${c}" stroke-width="1.5" fill="none" opacity="0.5"><animate attributeName="opacity" values="0;0.6;0" dur="2s" begin="${i*0.4}s" repeatCount="indefinite"/></path>`;
+    return `<svg viewBox="0 0 200 140"><rect x="20" y="44" width="160" height="62" rx="8" fill="#0c0e16" stroke="${c}" stroke-opacity="0.5"/><rect x="20" y="44" width="160" height="62" rx="8" fill="${c}" opacity="0.06"/>
+    <rect x="28" y="50" width="144" height="10" rx="4" fill="${c}" opacity="0.25"/>${spinner(60,80,18,c,'1.8s')}${spinner(100,80,18,c,'2.2s')}${spinner(140,80,18,c,'1.6s')}
+    <rect x="44" y="106" width="70" height="8" fill="${c}" opacity="0.5"/>${waves}</svg>`;},
+  mobo:c=>{let slots='';for(let i=0;i<4;i++)slots+=`<rect x="${96+i*9}" y="28" width="4" height="50" fill="${c}" opacity="0.4"/>`;
+    const traces=['M80,53 L96,53','M80,60 L150,98','M57,76 L57,92','M144,96 L150,96'].map(d=>`<path d="${d}" stroke="${c}" stroke-width="1.6" fill="none" class="flow" opacity="0.8"/>`).join('');
+    return `<svg viewBox="0 0 200 140"><rect x="16" y="14" width="168" height="112" rx="6" fill="#0b1411" stroke="${c}" stroke-opacity="0.5"/>
+    <rect x="34" y="30" width="46" height="46" rx="4" fill="#11141f" stroke="${c}" stroke-opacity="0.6"/>${slots}
+    <rect x="34" y="92" width="110" height="9" rx="2" fill="${c}" opacity="0.35"/><rect x="150" y="86" width="22" height="22" rx="3" fill="#11141f" stroke="${c}" stroke-opacity="0.5"/>
+    ${traces}<circle cx="57" cy="53" r="3" fill="${c}" class="pulseGlow"/></svg>`;},
+  ram:c=>{let g='';for(let s=0;s<2;s++){let chips='';for(let i=0;i<4;i++)chips+=`<rect x="4" y="${46+i*14}" width="18" height="10" rx="1.5" fill="#11141f" stroke="${c}" stroke-opacity="0.35"/>`;
+      let ct='';for(let i=0;i<9;i++)ct+=`<rect x="${2+i*2.6}" y="114" width="1.4" height="4" fill="${c}" opacity="0.6"/>`;
+      g+=`<g transform="translate(${64+s*36},0)"><rect x="0" y="22" width="26" height="96" rx="4" fill="#0c0e16" stroke="${c}" stroke-opacity="0.55"/>
+        <rect x="2" y="26" width="22" height="14" rx="2" fill="${c}" opacity="0.22"/>${chips}${ct}
+        <circle r="2.2" fill="${c}"><animateMotion dur="1.5s" begin="${s*0.4}s" repeatCount="indefinite" path="M13,116 L13,30"/></circle></g>`;}
+    return `<svg viewBox="0 0 200 140">${g}<text x="100" y="16" text-anchor="middle" font-size="8" fill="${c}" font-family="monospace" opacity="0.8">DDR5-6000 · 1:1</text></svg>`;},
+  ssd:c=>{let nand='';for(let i=0;i<4;i++)nand+=`<rect x="${62+i*26}" y="62" width="20" height="18" rx="2" fill="${c}" opacity="0.2"><animate attributeName="opacity" values="0.15;0.85;0.15" dur="1.6s" begin="${i*0.4}s" repeatCount="indefinite"/></rect>`;
+    return `<svg viewBox="0 0 200 140"><rect x="24" y="56" width="152" height="30" rx="4" fill="#0c0e16" stroke="${c}" stroke-opacity="0.55"/>
+    <rect x="32" y="62" width="18" height="18" rx="2" fill="#11141f" stroke="${c}" stroke-opacity="0.5"/>${nand}
+    <rect x="170" y="66" width="8" height="10" rx="1" fill="${c}" opacity="0.5"/><circle cx="172" cy="71" r="2" fill="#0c0e16" stroke="${c}" stroke-opacity="0.6"/>
+    <path d="M24,100 L176,100" stroke="${c}" stroke-width="1.6" class="flow" opacity="0.7"/>
+    <text x="100" y="44" text-anchor="middle" font-size="8" fill="${c}" font-family="monospace" opacity="0.8">7,450 MB/s · PCIe 4.0 ×4</text></svg>`;},
+  psu:c=>{let rails='';[58,70,82].forEach(y=>rails+=`<path d="M166,${y} L196,${y}" stroke="${c}" stroke-width="1.6" class="flow" opacity="0.8"/>`);
+    return `<svg viewBox="0 0 200 140"><defs><marker id="ar" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L5,3 L0,6 z" fill="${c}"/></marker></defs>
+    <rect x="34" y="34" width="132" height="72" rx="8" fill="#0c0e16" stroke="${c}" stroke-opacity="0.55"/>${spinner(70,70,20,c,'3s')}
+    <path d="M6,70 q5,-12 10,0 t10,0 t10,0" stroke="${c}" stroke-width="1.8" fill="none" opacity="0.8"><animate attributeName="opacity" values="0.4;1;0.4" dur="1.4s" repeatCount="indefinite"/></path>
+    <text x="14" y="92" font-size="7" fill="${c}" font-family="monospace" opacity="0.7">AC</text><path d="M28,70 L34,70" stroke="${c}" stroke-width="1.6" marker-end="url(#ar)"/>${rails}
+    <text x="180" y="50" font-size="7" fill="${c}" font-family="monospace" opacity="0.7">12V</text>
+    <text x="120" y="98" text-anchor="middle" font-size="8" fill="${c}" font-family="monospace" opacity="0.85">1000W · 80+ GOLD</text></svg>`;},
+  cooler:c=>{let fins='';for(let i=0;i<9;i++)fins+=`<line x1="24" y1="${28+i*10}" x2="62" y2="${28+i*10}" stroke="${c}" stroke-opacity="0.3"/>`;
+    return `<svg viewBox="0 0 200 140"><rect x="20" y="22" width="46" height="96" rx="6" fill="#0c0e16" stroke="${c}" stroke-opacity="0.55"/>${fins}
+    ${spinner(43,44,13,c,'2s')}${spinner(43,70,13,c,'2.3s')}${spinner(43,96,13,c,'1.9s')}
+    <rect x="120" y="56" width="44" height="44" rx="8" fill="#11141f" stroke="${c}" stroke-opacity="0.6"/><circle cx="142" cy="78" r="12" fill="${c}" opacity="0.18" class="pulseGlow"/>
+    <text x="142" y="50" text-anchor="middle" font-size="7" fill="${c}" font-family="monospace" opacity="0.8">PUMP</text>
+    <path d="M66,40 C100,40 120,58 122,62" stroke="${c}" stroke-width="3" fill="none" class="flow" opacity="0.85"/>
+    <path d="M122,94 C120,98 100,100 66,100" stroke="#f06363" stroke-width="3" fill="none" class="flow" opacity="0.7"/>
+    <text x="100" y="120" text-anchor="middle" font-size="7" fill="${c}" font-family="monospace" opacity="0.7">↑ cool · warm ↓</text></svg>`;},
+  fans:c=>{let arr='';[26,70,114].forEach(y=>arr+=`<path d="M6,${y} L20,${y}" stroke="${c}" stroke-width="1.6" opacity="0.6" class="flow"/>`);
+    return `<svg viewBox="0 0 200 140"><rect x="30" y="14" width="140" height="112" rx="8" fill="#0b1411" stroke="${c}" stroke-opacity="0.3"/>
+    ${spinner(70,50,20,c,'1.7s')}${spinner(130,50,20,c,'2.1s')}${spinner(70,92,20,c,'2.4s')}${spinner(130,92,20,c,'1.9s')}${arr}
+    <text x="100" y="138" text-anchor="middle" font-size="7" fill="${c}" font-family="monospace" opacity="0.7">positive pressure · 10× 120mm</text></svg>`;},
+  case:c=>`<svg viewBox="0 0 200 140"><rect x="40" y="14" width="120" height="112" rx="8" fill="#0c0e16" stroke="${c}" stroke-opacity="0.5"/>
+    <line x1="118" y1="16" x2="118" y2="124" stroke="${c}" stroke-opacity="0.3" stroke-dasharray="4 4"/>
+    <rect x="50" y="24" width="58" height="70" rx="3" fill="#11141f" stroke="${c}" stroke-opacity="0.3"/><rect x="50" y="98" width="58" height="14" rx="2" fill="${c}" opacity="0.18"/>
+    <rect x="124" y="22" width="10" height="80" rx="2" fill="${c}" opacity="0.2"/><rect x="138" y="100" width="18" height="18" rx="2" fill="#11141f" stroke="${c}" stroke-opacity="0.3"/>
+    ${spinner(132,40,6,c,'2.4s',5)}${spinner(132,62,6,c,'2.1s',5)}
+    <text x="79" y="60" text-anchor="middle" font-size="7" fill="${c}" font-family="monospace" opacity="0.6">SHOWCASE</text>
+    <text x="147" y="138" text-anchor="middle" font-size="6" fill="${c}" font-family="monospace" opacity="0.5">HIDDEN BAY</text></svg>`,
+};
+
+/* ───────────────── STATE / RENDER ───────────────── */
+const STORAGE='apex-build-owned-v1';
+let bought=new Set();
+try{const r=localStorage.getItem(STORAGE);if(r)bought=new Set(JSON.parse(r));}catch(e){}
+let focused=null;
+
+document.getElementById('title').textContent=META.name;
+document.getElementById('subtitle').textContent=META.subtitle;
+document.getElementById('footTotal').textContent=usd(TOTALS.current);
+document.getElementById('footRange').textContent=usd(TOTALS.low)+'–'+usd(TOTALS.high);
+document.getElementById('asof').textContent=PRICE_AS_OF;
+document.querySelectorAll('.asof').forEach(e=>e.textContent=PRICE_AS_OF);
+document.getElementById('stats').innerHTML=`
+  <div class="stat glass"><div class="l">Build cost (now)</div><div class="v" style="color:#7df9ff">${usd(TOTALS.current)}</div></div>
+  <div class="stat glass"><div class="l">Range</div><div class="v" style="color:#b6ff6b">${usd(TOTALS.low)} – ${usd(TOTALS.high)}</div></div>
+  <div class="stat glass"><div class="l">Parts</div><div class="v" style="color:#f4c042">${PARTS.length}</div></div>`;
+
+const grid=document.getElementById('grid');
+function cardHTML(p){
+  const owned=bought.has(p.id);
+  const specs=p.specs.map(s=>`<div class="row"><dt>${s[0]}</dt><dd>${s[1]}</dd></div>`).join('');
+  const steps=p.how.steps.map((s,i)=>`<li><span class="n" style="background:${p.accent}22;color:${p.accent}">${i+1}</span><span>${s}</span></li>`).join('');
+  const hasCur=p.alts&&p.alts.some(a=>a.current);
+  const pills=(p.alts||[]).map(a=>`<span class="pill ${a.current?'cur':''}" title="${a.note.replace(/"/g,'&quot;')}">${a.current?'<span class="yr">2026</span>':''}<span>${a.name}</span>${a.price?`<span class="pr">· ${usd(a.price)}</span>`:''}</span>`).join('');
+  const sources=p.sources.map(s=>`<a class="src" href="${s.url}" target="_blank" rel="noreferrer" title="${s.label.replace(/"/g,'&quot;')}">price source ↗</a>`).join('');
+  return `<article class="card glass ${owned?'owned':''}" data-id="${p.id}">
+    <div class="edge" style="background:linear-gradient(90deg,${p.accent},transparent)"></div>
+    <div class="card-body">
+      <div class="card-head">
+        <div><span class="chip" style="border-color:${p.accent}55;color:${p.accent}">${p.category}${p.quantity>1?' · ×'+p.quantity:''}</span>
+          <h3>${p.name}</h3><div class="muted" style="font-size:12px">${p.brand}</div></div>
+        <div style="text-align:right;flex:none"><div class="price" style="color:${p.accent}">${usd(p.price.current)}</div>
+          <div class="price-range">${usd(p.price.low)}–${usd(p.price.high)}</div>${p.price.elevated?`<div class="msrp">MSRP ${usd(p.price.msrp)} ↑</div>`:''}</div>
+      </div>
+      <div class="art">${ART[p.art](p.accent)}</div>
+      <p class="tagline">${p.tagline}</p>
+      <div class="tabs"><button class="tab active" data-tab="specs">Specs</button><button class="tab" data-tab="func">How it works</button></div>
+      <dl class="specs tabpane" data-pane="specs">${specs}</dl>
+      <div class="func tabpane" data-pane="func" style="display:none"><p>${p.how.summary}</p><ol class="steps">${steps}</ol></div>
+      ${p.alts&&p.alts.length?`<div class="alts"><div class="lbl">${hasCur?'Alternatives &amp; current-gen swaps':'Alternatives'}</div><div class="pills">${pills}</div></div>`:''}
+      <div class="card-foot"><div style="display:flex;gap:8px;flex-wrap:wrap">${sources}</div>
+        <button class="buy ${owned?'owned':''}" data-buy="${p.id}">${owned?'✓ Owned':'Mark as bought'}</button></div>
+    </div></article>`;
+}
+grid.innerHTML=PARTS.map(cardHTML).join('');
+
+// tabs + buy delegation
+grid.addEventListener('click',e=>{
+  const tab=e.target.closest('.tab');
+  if(tab){const card=tab.closest('.card');card.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===tab));
+    card.querySelectorAll('.tabpane').forEach(p=>p.style.display=p.dataset.pane===tab.dataset.tab?'':'none');return;}
+  const buy=e.target.closest('[data-buy]');
+  if(buy){toggleBought(buy.dataset.buy);}
+});
+grid.addEventListener('mouseover',e=>{const card=e.target.closest('.card');if(card){focused=card.dataset.id;updateFocusChip();updateTints();}});
+
+function toggleBought(id){
+  bought.has(id)?bought.delete(id):bought.add(id);
+  try{localStorage.setItem(STORAGE,JSON.stringify([...bought]));}catch(e){}
+  const card=grid.querySelector(`.card[data-id="${id}"]`);
+  const owned=bought.has(id);
+  card.classList.toggle('owned',owned);
+  const b=card.querySelector('[data-buy]');b.classList.toggle('owned',owned);b.textContent=owned?'✓ Owned':'Mark as bought';
+  renderTracker();updateTints();
+}
+function renderTracker(){
+  const ownedCost=PARTS.filter(p=>bought.has(p.id)).reduce((s,p)=>s+p.price.current,0);
+  const pct=Math.round(bought.size/PARTS.length*100);
+  document.getElementById('trackerText').textContent=`${bought.size} / ${PARTS.length} parts owned · ${usd(ownedCost)} spent · ${usd(TOTALS.current-ownedCost)} to go`;
+  document.getElementById('pct').textContent=pct+'%';
+  document.getElementById('bar').style.width=pct+'%';
+  document.getElementById('resetBtn').style.display=bought.size?'':'none';
+}
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  bought=new Set();try{localStorage.setItem(STORAGE,'[]');}catch(e){}
+  grid.querySelectorAll('.card').forEach(c=>{c.classList.remove('owned');const b=c.querySelector('[data-buy]');b.classList.remove('owned');b.textContent='Mark as bought';});
+  renderTracker();updateTints();
+});
+renderTracker();
+
+/* theme toggle */
+const tBtn=document.getElementById('themeToggle');
+function syncIcon(){tBtn.textContent=document.documentElement.classList.contains('light')?'🌙':'☀️';}
+syncIcon();
+tBtn.addEventListener('click',()=>{
+  const light=document.documentElement.classList.toggle('light');
+  document.documentElement.classList.toggle('dark',!light);
+  try{localStorage.setItem('apex-theme',light?'light':'dark');}catch(e){}
+  syncIcon();
+});
+
+function updateFocusChip(){
+  const chip=document.getElementById('focusChip');
+  const p=PARTS.find(x=>x.id===focused);
+  if(p){chip.textContent=p.name;chip.style.display='';}else{chip.style.display='none';}
+}
+
+/* ───────────────── 3D EXPLODED VIEW ───────────────── */
+const LAYOUT=[
+  {id:'case',label:'Lian Li O11D EVO',args:[4.2,5,4.2],pos:[0,0,0],dir:[0,0,0],color:'#7f8aa3',wire:true},
+  {id:'mobo',label:'X670E-E Motherboard',args:[3,4,0.16],pos:[-0.2,0.2,-1.7],dir:[0,0,-2.2],color:'#ff2d75'},
+  {id:'cpu',label:'Ryzen 9 9950X3D',args:[0.7,0.7,0.22],pos:[-0.7,0.95,-1.5],dir:[-1.4,1.6,0],color:'#ed1c24'},
+  {id:'ram',label:'32GB DDR5-6000',args:[0.55,1.5,0.18],pos:[0.55,0.85,-1.5],dir:[1.6,1.7,0],color:'#9b7dff',stack:2},
+  {id:'cooler',label:'Arctic LF III 360',args:[0.42,3.4,2.9],pos:[-2.0,0.2,0],dir:[-2.4,0,0],color:'#22d3ee'},
+  {id:'pump',label:'',args:[0.7,0.7,0.5],pos:[-0.7,0.95,-1.2],dir:[-2.2,1.6,0],color:'#22d3ee'},
+  {id:'gpu',label:'RTX 4090',args:[3.1,0.5,1.5],pos:[0,-0.5,-0.5],dir:[0,0,2.6],color:'#76b900'},
+  {id:'ssd',label:'990 Pro 2TB',args:[0.9,0.12,0.32],pos:[0.4,-0.2,-1.55],dir:[0.4,-1.3,0],color:'#3b82f6'},
+  {id:'psu',label:'1000W PSU',args:[1.7,1.0,2.2],pos:[0.9,-2.0,-0.4],dir:[0,-2.2,0],color:'#f4c042'},
+];
+const lerp=(a,b,t)=>a+(b-a)*t;
+const canvas=document.getElementById('scene');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene=new THREE.Scene();scene.background=new THREE.Color('#070811');scene.fog=new THREE.Fog('#070811',14,26);
+const camera=new THREE.PerspectiveCamera(42,1,0.1,100);camera.position.set(7,3.5,8);
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.enablePan=false;controls.minDistance=6;controls.maxDistance=16;controls.enableDamping=true;controls.autoRotateSpeed=0.6;
+
+scene.add(new THREE.AmbientLight(0xffffff,0.6));
+const d1=new THREE.DirectionalLight(0xffffff,1.1);d1.position.set(5,8,6);scene.add(d1);
+const d2=new THREE.DirectionalLight(0x7df9ff,0.5);d2.position.set(-6,3,-4);scene.add(d2);
+const pl=new THREE.PointLight(0x76b900,0.6);pl.position.set(0,-2,4);scene.add(pl);
+// soft ground
+const ground=new THREE.Mesh(new THREE.CircleGeometry(7,48),new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:0.35}));
+ground.rotation.x=-Math.PI/2;ground.position.y=-2.7;scene.add(ground);
+
+const meshes=[];
+LAYOUT.forEach(p=>{
+  if(p.wire){
+    const box=new THREE.Mesh(new THREE.BoxGeometry(...p.args),new THREE.MeshStandardMaterial({color:p.color,transparent:true,opacity:0.06}));
+    const edges=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(...p.args)),new THREE.LineBasicMaterial({color:0x3a4d6b}));
+    const g=new THREE.Group();g.add(box);g.add(edges);g.position.set(...p.pos);scene.add(g);
+    return;
+  }
+  const g=new THREE.Group();g.position.set(...p.pos);
+  const stacks=p.stack||1;
+  const mats=[];
+  for(let i=0;i<stacks;i++){
+    const mat=new THREE.MeshStandardMaterial({color:p.color,metalness:0.45,roughness:0.35,emissive:0x000000});
+    const m=new THREE.Mesh(new THREE.BoxGeometry(...p.args),mat);
+    m.position.x=i*(p.args[0]+0.18);g.add(m);mats.push(mat);
+  }
+  g.userData={...p,mats};
+  scene.add(g);meshes.push(g);
+});
+
+function updateTints(){
+  meshes.forEach(g=>{
+    const id=g.userData.id;
+    const isBought=bought.has(id);
+    const isFocus=focused===id||(id==='cooler'&&focused==='cooler');
+    let col=0x000000,inten=0;
+    if(isBought){col=0x1fbf6b;inten=0.5;}
+    else if(isFocus){col=0x7df9ff;inten=0.6;}
+    g.userData.mats.forEach(m=>{m.emissive.setHex(col);m.emissiveIntensity=inten;});
+  });
+}
+updateTints();
+
+// raycast hover/click
+const ray=new THREE.Raycaster();const ptr=new THREE.Vector2();let hoverId=null;
+function pick(ev){
+  const r=canvas.getBoundingClientRect();
+  ptr.x=((ev.clientX-r.left)/r.width)*2-1;ptr.y=-((ev.clientY-r.top)/r.height)*2+1;
+  ray.setFromCamera(ptr,camera);
+  const hits=ray.intersectObjects(meshes,true);
+  return hits.length?hits[0].object.parent.userData.id:null;
+}
+canvas.addEventListener('pointermove',ev=>{
+  const id=pick(ev);hoverId=id;canvas.style.cursor=id?'pointer':'grab';
+  if(id){focused=id;updateFocusChip();updateTints();}
+});
+canvas.addEventListener('pointerdown',ev=>{const id=pick(ev);if(id){focused=id;updateFocusChip();updateTints();
+  const card=grid.querySelector(`.card[data-id="${id}"]`);if(card)card.scrollIntoView({behavior:'smooth',block:'center'});}});
+
+let explode=0;
+const slider=document.getElementById('explode');
+const vState=document.getElementById('viewState');
+const btnA=document.getElementById('btnAssembled'),btnE=document.getElementById('btnExploded');
+function setExplode(v){explode=v;slider.value=v;
+  vState.textContent=v<0.05?'COMPLETED BUILD':v>0.9?'EXPLODED VIEW':'DISASSEMBLING…';
+  btnA.classList.toggle('active',v<0.05);btnE.classList.toggle('active',v>0.95);}
+slider.addEventListener('input',e=>setExplode(parseFloat(e.target.value)));
+btnA.addEventListener('click',()=>setExplode(0));
+btnE.addEventListener('click',()=>setExplode(1));
+
+function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;if(canvas.width!==w||canvas.height!==h){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}}
+function tick(){
+  resize();
+  controls.autoRotate=explode<0.02;
+  meshes.forEach(g=>{const p=g.userData;g.position.set(lerp(p.pos[0],p.pos[0]+p.dir[0],explode),lerp(p.pos[1],p.pos[1]+p.dir[1],explode),lerp(p.pos[2],p.pos[2]+p.dir[2],explode));
+    const tgt=(hoverId===p.id)?1.04:1;g.scale.x+=(tgt-g.scale.x)*0.2;g.scale.y=g.scale.z=g.scale.x;});
+  controls.update();renderer.render(scene,camera);requestAnimationFrame(tick);
+}
+tick();
+</script>
+</body>
+</html>
